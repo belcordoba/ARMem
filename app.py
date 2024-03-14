@@ -3,6 +3,11 @@ import time
 import random
 
 def user_names(dic_players):
+    """Requests user input to add the names of the players in a dictionary.
+
+    Args:
+        dic_players (_type_): Dictionary where the names of the players will be stored.
+    """
     list_base = [0, 0, 0]
     player_amount = 0
     player_list = []
@@ -33,12 +38,18 @@ def user_names(dic_players):
     for name in dic_players.keys():
         if name not in player_list:
             player_list.append(name)
-    print(f"Player registration completed!\nCurrent player list:\n{player_list}\nReturning to main menu...")
-    time.sleep(4)
-    
+    cont = input(f"Player registration completed!\nCurrent player list:\n{player_list}\nPress the enter key to continue.\n")
     print('\033[2J')
 
 def generate_list(length):
+    """Generates a random list of elements that the player will have to sort.
+
+    Args:
+        length (_type_): Defines the amount of elements that need to be added to the randomized list.
+
+    Returns:
+        _type_: Returns the randomized list with the amount of elements that were requested.
+    """
     options = [(0, "pineapple"), (1, "cherry"), (2, "grape"), (3, "pear"), (4, "soursop")]
     generated_list = []
 
@@ -46,11 +57,18 @@ def generate_list(length):
         number = random.choice(options)
         if number not in generated_list:
             generated_list.append(number)
-
     return generated_list
 
 def levels(level, players):
+    """Shows the instructions and executes each different level with their respective iterations.
 
+    Args:
+        level (_type_): Defines the level that is currently being executed.
+        players (_type_): Dictionary with the names and times of the player, where the total time for each player will be stored.
+
+    Returns:
+        _type_: Returns the modified dictionary with the times for each player after the execution of a level.
+    """
     if level == 0:
         cont = input("Instructions:\nA list of elements are going to be shown in your screen. You will have 5 seconds to memorize all of the X (elements).\nThen you will have to show the markers to the camera, arranging them in the order that was shown to you previously.\nEach player will have their turn and each level will have five turns per player.\nYou can take your time but try to do it as fast as you can!\nGood luck!\n\nPress the enter key to continue.\n")
         print('\033[2J')
@@ -98,25 +116,98 @@ def levels(level, players):
                 print('\033[2J')
     return players
 
-def sort_value(item):
-    return item[1]
+def sort_value(value_list):
+    """Takes the lists with each player name along their total time during a level (or total game time) and extracts the time so it can be used as the point of reference while sorting.
 
-def level_report(data, level):
+    Args:
+        value_list (_type_): List that contains nested lists with the player's name and total time during a level (or their total game time).
+
+    Returns:
+        _type_: Returns the times that will be needed while sorting the player's scores.
+    """
+    return value_list[1]
+
+def level_report(level, data):
+    """Generates the report with each of the player's performance after the execution of a level.
+
+    Args:
+        level (_type_): Defines the level that is currently being executed.
+        data (_type_): Dictionary with the names and times of the players.
+    """
+    if level > 0:
+        data_list = []
+        length = len(data)
+        for x, y in data.items():
+            data_list.append([x,y[level-1]])
+
+        data_list.sort(key=sort_value)
+        print(f"#### Leaderboard - Level #{level-0} ####")
+        for i in range(length):
+            print(f"#{i+1} - Name: {data_list[i][0]} - Time: {data_list[i][1]}s")
+        cont = input("Press the enter key to continue.\n")
+
+def game_report(data):
+    """Generates the report with each of the player's performance after the execution of the whole game.
+
+    Args:
+        data (_type_): Dictionary with the names and times of the players.
+    """
     data_list = []
     length = len(data)
     for x, y in data.items():
-        data_list.append([x,y[level]])
+        data_sum = y[0] + y[1] + y[2]
+        data_list.append([x,data_sum])
+        data_sum = 0
 
     data_list.sort(key=sort_value)
-    print(f"Leaderboard - Level #{level}")
+    print(f"#### Leaderboard - Full game ####")
     for i in range(length):
         print(f"#{i+1} - Name: {data_list[i][0]} - Time: {data_list[i][1]}s")
+    cont = input("Press the enter key to continue.\n")
+
+def restart():
+    """After finishing a game, lets the players choose whether they want to play again (with the same players o a new list) or if they want to leave the game.
+
+    Returns:
+        _type_: Returns different results according to the choice made by the players, clearing data and/or calling the respective function that does what the player requested.
+    """
+    while True:
+            print("#### Thank you for playing ARMem #### \nWould you like to play again? If you do, you will return to the main menu.\n1 > Yes, using a new player list\n2 > Yes, using the same player list\n3 > No")
+            player_choice = str(input("Enter the number of the option that you would like to choose: "))
+            print('\033[2J')
+
+            if player_choice == "1":
+                dic_players = {}
+                cont = input("Player list cleared!\nYou will be able to add new players with the player registration menu.\nPress the enter key to continue.\n")
+                main_menu()
+            elif player_choice == "2":
+                player_list = []
+                for name in dic_players.keys():
+                    player_list.append(name)
+                cont = input((f"The current player list is:\n{player_list}\nYou will be able to add more players with the player registration menu.\nPress the enter key to continue.\n"))
+            elif player_choice == "3":
+                quit()
+            else:
+                print("This is not a valid choice! Enter the number of one of the options.\nReturning to end screen...")
+                time.sleep(4)
+                print('\033[2J')   
 
 def game():
-    for level in range(0, 4):
-        levels(level, dic_players)
+    """Calls the functions that will be needed during the execution of a game.
+    """
+    while True:
+        for level in range(0, 4):
+            levels(level, dic_players)
+            level_report(level, dic_players)
+        game_report(dic_players)
+        restart()
 
 def main_menu(dic_players):
+    """Allows the player to choose the action that they want to do within the game.
+
+    Args:
+        dic_players (_type_): Dictionary with the names and times of the players.
+    """
     while True:
         print("#### ARMem #### \n1 > Player registration\n2 > Start game\n3 > Leave game")
         player_choice = str(input("Enter the number of the option that you would like to choose: "))
