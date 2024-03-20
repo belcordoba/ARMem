@@ -1,5 +1,23 @@
+"""
+Authors:
+    Mariana Acuña Rodríguez, María Belén Córdoba Arroyo
+Library Requirements:
+    pip install opencv-python
+    pip install opencv-contrib-python
+    pip install numpy
+"""
+
+"""
+'ARMem' contains the function used for the AR implementation.
+"""
 import ARMem as ar
+"""
+The 'time' module contains time-related functions.
+"""
 import time
+"""
+The 'time' module contains randomly generated-related functions.
+"""
 import random
 
 def user_names(players):
